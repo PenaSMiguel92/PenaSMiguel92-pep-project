@@ -1,5 +1,7 @@
 package Controller;
 
+import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -14,10 +16,20 @@ public class SocialMediaController {
      * suite must receive a Javalin object from this method.
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
+    private AccountService accountService = new AccountService();
+    private MessageService messageService = new MessageService();
+
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
-
+        //app.get("example-endpoint", this::exampleHandler);
+        app.post("/register", accountService::userRegistration);
+        app.post("/login", accountService::userLogin);
+        app.post("/messages", messageService::createMessage);
+        app.get("/messages", messageService::getAllMessages);
+        app.get("/messages/{message_id}", messageService::getMessageById);
+        app.delete("/messages/{message_id}", messageService::deleteMessageById);
+        app.patch("/messages/{message_id}", messageService::updateMessageById);
+        app.get("/accounts/{account_id}/messages", messageService::getAllMessagesByUserId);
         return app;
     }
 
@@ -25,9 +37,9 @@ public class SocialMediaController {
      * This is an example handler for an example endpoint.
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
-    }
+    // private void exampleHandler(Context context) {
+    //     context.json("sample text");
+    // }
 
 
 }
