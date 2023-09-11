@@ -9,7 +9,7 @@ public class AccountDAO {
     public Account create(Account data) {
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "INSERT INTO Account VALUES (DEFAULT, ?, ?)";
+            String sql = "INSERT INTO account (username, password) VALUES (?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, data.getUsername());
             ps.setString(2, data.getPassword());

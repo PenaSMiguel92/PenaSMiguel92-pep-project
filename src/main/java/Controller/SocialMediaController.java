@@ -1,5 +1,7 @@
 package Controller;
 
+import Model.Account;
+import Model.Message;
 import Service.AccountService;
 import Service.MessageService;
 import io.javalin.Javalin;
@@ -22,14 +24,14 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         //app.get("example-endpoint", this::exampleHandler);
-        app.post("/register", accountService::userRegistration);
-        app.post("/login", accountService::userLogin);
-        app.post("/messages", messageService::createMessage);
-        app.get("/messages", messageService::getAllMessages);
-        app.get("/messages/{message_id}", messageService::getMessageById);
-        app.delete("/messages/{message_id}", messageService::deleteMessageById);
-        app.patch("/messages/{message_id}", messageService::updateMessageById);
-        app.get("/accounts/{account_id}/messages", messageService::getAllMessagesByUserId);
+        app.post("/register", this::userRegistration);
+        app.post("/login", this::userLogin);
+        app.post("/messages", this::createMessage);
+        app.get("/messages", this::getAllMessages);
+        app.get("/messages/{message_id}", this::getMessageById);
+        app.delete("/messages/{message_id}", this::deleteMessageById);
+        app.patch("/messages/{message_id}", this::updateMessageById);
+        app.get("/accounts/{account_id}/messages", this::getAllMessagesByUserId);
         return app;
     }
 
@@ -40,6 +42,53 @@ public class SocialMediaController {
     // private void exampleHandler(Context context) {
     //     context.json("sample text");
     // }
+    
+    private void userRegistration(Context ctx) {
+        Account user = ctx.bodyAsClass(Account.class);
+        if (user.getUsername() == null || user.getUsername().length() < 1) {
+            ctx.status(400);
+            return;
+        }
+        if (user.getPassword().length() < 4) {
+            ctx.status(400);
+            return;
+        }
+        if (!accountService.checkIfUsernameExists(user.getUsername()))
+            if (accountService.addAccount(user)) {
+                ctx.status(200);
+                ctx.json(user);
+            }
+            else
+                ctx.status(400);
 
+    }
+
+    private void userLogin(Context ctx) {
+        
+    }
+
+    public void createMessage(Context ctx) {
+
+    }
+
+    public void getAllMessages(Context ctx) {
+
+    }
+
+    public void getMessageById(Context ctx) {
+
+    }
+
+    public void deleteMessageById(Context ctx) {
+
+    }
+
+    public void updateMessageById(Context ctx) {
+
+    }
+
+    public void getAllMessagesByUserId(Context ctx) {
+        
+    }
 
 }

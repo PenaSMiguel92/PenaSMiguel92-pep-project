@@ -1,15 +1,25 @@
 package Service;
 import DAO.AccountDAO;
+import Model.Account;
 import io.javalin.http.Context;
+import java.util.*;
 
 public class AccountService {
     AccountDAO accountDAO = new AccountDAO();
 
-    public void userRegistration(Context ctx) {
-
+    public boolean checkIfUsernameExists(String username) {
+        List<String> usernames = this.accountDAO.getAllUsernames();
+        return usernames.contains(username);
     }
 
-    public void userLogin(Context ctx) {
-        
+    public boolean addAccount(Account user) {
+        Account updatedAccount = this.accountDAO.create(user);
+        if (updatedAccount != null) {
+            user.setAccount_id(updatedAccount.getAccount_id());
+            return true;
+        } else {
+            return false;
+        }
     }
+
 }
