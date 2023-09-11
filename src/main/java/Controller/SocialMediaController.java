@@ -6,6 +6,7 @@ import Service.AccountService;
 import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import java.util.*;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -80,10 +81,29 @@ public class SocialMediaController {
     }
 
     public void createMessage(Context ctx) {
+        Message message = ctx.bodyAsClass(Message.class);
+        if (message.getMessage_text() == null || 
+            message.getMessage_text().length() < 1 || 
+            message.getMessage_text().length() >= 255) {
+            ctx.status(400);
+            return;
+        }
 
+        if (accountService.accountExistsById(message.getPosted_by())) {
+            if (messageService.addMessage(message)) {
+                ctx.status(200);
+                ctx.json(message);
+                return;
+            }
+        }
+
+        ctx.status(400);
     }
 
     public void getAllMessages(Context ctx) {
+        List<Message> messages = messageService.getAllMessages();
+        ctx.status(200);
+        ctx.json(messages);
 
     }
 

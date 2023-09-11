@@ -9,7 +9,7 @@ public class AccountDAO {
     public Account create(Account data) {
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "INSERT INTO account (username, password) VALUES (?, ?)";
+            String sql = "INSERT INTO account VALUES (DEFAULT, ?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, data.getUsername());
             ps.setString(2, data.getPassword());
@@ -57,6 +57,22 @@ public class AccountDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean accountExistsById(int id) {
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "SELECT username FROM account WHERE account_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

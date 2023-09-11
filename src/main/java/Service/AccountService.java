@@ -26,4 +26,8 @@ public class AccountService {
         return this.accountDAO.getAccount(user);
     }
 
+    public boolean accountExistsById(int id) {
+        return this.accountDAO.accountExistsById(id);
+    }
+
 }

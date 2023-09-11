@@ -7,11 +7,11 @@ import java.util.*;
 public class MessageDAO {
 
     public Message create(Message message) {
-        Message newMessage = null;
+        //Message newMessage = null;
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "INSERT INTO Message VALUES (DEFAULT, ?, ?, ?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            String sql = "INSERT INTO message VALUES (DEFAULT, ?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, message.getPosted_by());
             ps.setString(2, message.getMessage_text());
             ps.setLong(3, message.getTime_posted_epoch());
@@ -20,16 +20,13 @@ public class MessageDAO {
             ResultSet pkeyResultSet = ps.getGeneratedKeys();
             if (pkeyResultSet.next()) {
                 int generated_message_id = pkeyResultSet.getInt(1);
-                newMessage = new Message(generated_message_id, 
-                                   message.getPosted_by(),
-                                   message.getMessage_text(), 
-                                   message.getTime_posted_epoch()
-                                   );
+                message.setMessage_id(generated_message_id);
+                return message;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return newMessage;
+        return null;
     }
     
     public List<Message> getAll() {
