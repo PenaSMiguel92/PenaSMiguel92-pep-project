@@ -26,6 +26,7 @@ public class SocialMediaController {
         //app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::userRegistration);
         app.post("/login", this::userLogin);
+        
         app.post("/messages", this::createMessage);
         app.get("/messages", this::getAllMessages);
         app.get("/messages/{message_id}", this::getMessageById);
@@ -53,18 +54,29 @@ public class SocialMediaController {
             ctx.status(400);
             return;
         }
-        if (!accountService.checkIfUsernameExists(user.getUsername()))
+        if (!accountService.checkIfUsernameExists(user.getUsername())) {
             if (accountService.addAccount(user)) {
                 ctx.status(200);
                 ctx.json(user);
+                return;
             }
-            else
-                ctx.status(400);
-
+        }
+           
+        ctx.status(400);
     }
 
     private void userLogin(Context ctx) {
-        
+        Account user = ctx.bodyAsClass(Account.class);
+        if (accountService.checkIfUsernameExists(user.getUsername())) {
+            Account existingUser = accountService.getAccountByUsername(user);
+            if (existingUser.getPassword().equals(user.getPassword())) {
+                user.setAccount_id(existingUser.getAccount_id());
+                ctx.status(200);
+                ctx.json(user);
+                return;
+            }
+        }
+        ctx.status(401);
     }
 
     public void createMessage(Context ctx) {

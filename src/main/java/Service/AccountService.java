@@ -22,4 +22,8 @@ public class AccountService {
         }
     }
 
+    public Account getAccountByUsername(Account user) {
+        return this.accountDAO.getAccount(user);
+    }
+
 }
