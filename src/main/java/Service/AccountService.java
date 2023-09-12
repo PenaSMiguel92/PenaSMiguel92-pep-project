@@ -1,7 +1,6 @@
 package Service;
 import DAO.AccountDAO;
 import Model.Account;
-import io.javalin.http.Context;
 import java.util.*;
 
 public class AccountService {
