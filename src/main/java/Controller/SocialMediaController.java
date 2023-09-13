@@ -77,6 +77,7 @@ public class SocialMediaController {
                 return;
             }
         }
+        
         ctx.status(401);
     }
 
