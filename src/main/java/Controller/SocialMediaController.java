@@ -49,19 +49,10 @@ public class SocialMediaController {
     
     private void userRegistration(Context ctx) {
         Account user = ctx.bodyAsClass(Account.class);
-        if (user.getUsername() == null || user.getUsername().length() < 1) {
-            ctx.status(400);
+        
+        if (accountService.addAccount(user)) {
+            ctx.json(user);
             return;
-        }
-        if (user.getPassword().length() < 4) {
-            ctx.status(400);
-            return;
-        }
-        if (!accountService.checkIfUsernameExists(user.getUsername())) {
-            if (accountService.addAccount(user)) {
-                ctx.json(user);
-                return;
-            }
         }
            
         ctx.status(400);
@@ -69,13 +60,9 @@ public class SocialMediaController {
 
     private void userLogin(Context ctx) {
         Account user = ctx.bodyAsClass(Account.class);
-        if (accountService.checkIfUsernameExists(user.getUsername())) {
-            Account existingUser = accountService.getAccountByUsername(user);
-            if (existingUser.getPassword().equals(user.getPassword())) {
-                user.setAccount_id(existingUser.getAccount_id());
-                ctx.json(user);
-                return;
-            }
+        if (accountService.login(user)) {
+            ctx.json(user);
+            return;
         }
         
         ctx.status(401);
@@ -83,18 +70,10 @@ public class SocialMediaController {
 
     public void createMessage(Context ctx) {
         Message message = ctx.bodyAsClass(Message.class);
-        if (message.getMessage_text() == null || 
-            message.getMessage_text().length() < 1 || 
-            message.getMessage_text().length() >= 255) {
-            ctx.status(400);
-            return;
-        }
 
-        if (accountService.accountExistsById(message.getPosted_by())) {
-            if (messageService.addMessage(message)) {
-                ctx.json(message);
-                return;
-            }
+        if (messageService.addMessage(message)) {
+            ctx.json(message);
+            return;
         }
 
         ctx.status(400);
@@ -126,22 +105,11 @@ public class SocialMediaController {
 
     public void updateMessageById(Context ctx) {
         Message message = ctx.bodyAsClass(Message.class);
-        
-        if (message.getMessage_text() == null || 
-            message.getMessage_text().length() < 1 || 
-            message.getMessage_text().length() >= 255) {
-                ctx.status(400);
-                return;
-        }
-
         String paramValue = ctx.pathParam("message_id");
         int message_id = Integer.parseInt(paramValue);
 
-        Message existingMessage = messageService.getMessageById(message_id);
-        if (existingMessage != null) {
-            existingMessage.setMessage_text(message.getMessage_text());
-            messageService.updateMessage(existingMessage);
-            ctx.json(existingMessage);
+        if (messageService.updateMessage(message, message_id)) {
+            ctx.json(message);
             return;
         }
 

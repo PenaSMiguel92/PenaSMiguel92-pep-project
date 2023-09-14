@@ -4,33 +4,61 @@ import Model.Message;
 import java.util.*;
 
 public class MessageService {
-    MessageDAO messageDAO = new MessageDAO();
+    private static MessageDAO messageDAO = new MessageDAO();
 
     public boolean addMessage(Message message) {
-        if (this.messageDAO.create(message) != null)
-            return true;
+        if (message.getMessage_text() == null || 
+            message.getMessage_text().length() < 1 || 
+            message.getMessage_text().length() >= 255) {
+            return false;
+        }
+
+        if (AccountService.accountExistsById(message.getPosted_by())) {
+            Message updatedMessage = messageDAO.create(message);
+            if (updatedMessage != null) {
+                message.setMessage_id(updatedMessage.getMessage_id());
+                return true;
+            }
+        }
 
         return false;
     }
 
     public List<Message> getAllMessages() {
-        return this.messageDAO.getAll();
+        return messageDAO.getAll();
     } 
 
     public Message getMessageById(int id) {
-        return this.messageDAO.getMessageById(id);
+        return messageDAO.getMessageById(id);
     }
 
     public Message deleteMessageById(int id) {
-        return this.messageDAO.deleteMessageById(id);
+        return messageDAO.deleteMessageById(id);
     }
 
-    public Message updateMessage(Message message) {
-        return this.messageDAO.updateMessage(message);
+    public boolean updateMessage(Message message, int message_id) {
+        if (message.getMessage_text() == null || 
+            message.getMessage_text().length() < 1 || 
+            message.getMessage_text().length() >= 255) {
+            return false;
+        }
+
+        Message existingMessage = getMessageById(message_id);
+        if (existingMessage != null) {
+            existingMessage.setMessage_text(message.getMessage_text());
+            if (messageDAO.updateMessage(existingMessage) != null) {
+                message.setMessage_id(message_id);
+                message.setPosted_by(existingMessage.getPosted_by());
+                message.setTime_posted_epoch(existingMessage.getTime_posted_epoch());
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<Message> getAllMessagesByAccountId(int id) {
-        return this.messageDAO.getAllMessagesByUserId(id);
+        return messageDAO.getAllMessagesByUserId(id);
     }
 
 }
